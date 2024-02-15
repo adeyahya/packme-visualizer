@@ -1,12 +1,20 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Box } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
+import { visualizer } from "./lib/visualizer";
 
 function App() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const { dispose } = visualizer(canvasRef.current);
+
+    return dispose;
+  }, []);
+
   return (
     <Flex flexDir="column" w="100svw" h="100svh" as="main">
-      <Flex flex={1}>Main</Flex>
-      <Flex bg="gray.200" w="full" h="20">
-        controls
-      </Flex>
+      <Box ref={canvasRef} w="full" h="100svh" as="canvas" />
     </Flex>
   );
 }
