@@ -29,17 +29,17 @@ export default function App() {
         containers: [
           {
             id: "container 1",
-            qty: 1,
+            qty: 3,
             dim: [30, 20, 30],
           },
           {
             id: "container 2",
-            qty: 1,
+            qty: 2,
             dim: [5, 5, 40],
           },
           {
             id: "container 3",
-            qty: 1,
+            qty: 2,
             dim: [20, 20, 30],
           },
         ],
@@ -88,7 +88,7 @@ export default function App() {
                 offset += arrs[i].dim.length + 10;
               }
               return (
-                <group key={container.id} position={[offset, 0, 0]}>
+                <group key={idx} position={[offset, 0, 0]}>
                   <Container data={container} />
                 </group>
               );
