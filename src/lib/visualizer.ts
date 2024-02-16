@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { AlgoInput, init } from "packme-wasm";
 
 const setupPacker = async () => {
@@ -60,6 +61,7 @@ export const visualizer = (canvas: HTMLCanvasElement) => {
   setupPacker();
   setupLighting(scene);
   const camera = setupCamera();
+  const controls = new OrbitControls(camera, renderer.domElement);
 
   const animate = () => {
     requestAnimationFrame(animate);
