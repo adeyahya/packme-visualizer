@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.11.0",
     "@react-three/drei": "^9.97.6",
     "@react-three/fiber": "^8.15.16",
+    "@vercel/analytics": "^1.2.0",
     "framer-motion": "^11.0.5",
     "leva": "^0.9.35",
     "lodash": "^4.17.21",

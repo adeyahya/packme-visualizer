@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
@@ -17,5 +18,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ChakraProvider theme={theme}>
       <App />
     </ChakraProvider>
+    <Analytics />
   </React.StrictMode>
 );
