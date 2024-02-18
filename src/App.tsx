@@ -7,66 +7,46 @@ import {
   AlgoResult,
   ContainerResult,
   ItemResult,
-  init,
 } from "packme-wasm";
 import { useMount } from "./hooks/useMount";
 import { useMemo, useRef, useState } from "react";
+import Sidebar from "./components/Sidebar";
 
 export default function App() {
+  const [isWorkerReady, setWorkerReady] = useState(false);
   const [result, setResult] = useState<AlgoResult | undefined>(undefined);
-  const packerRef = useRef<Awaited<ReturnType<typeof init>>>();
+  const workerRef = useRef<Worker>();
   const { position } = useControls({
     position: { value: [0, -20, 0], step: 1 },
   });
 
+  const workerPack = (input: AlgoInput) => {
+    setResult(undefined);
+    workerRef.current?.postMessage({ type: "pack", input });
+  };
+
   useMount(() => {
     const setupPacker = async () => {
-      const res = await fetch("/packme.wasm");
-      const buffer = await res.arrayBuffer();
-      packerRef.current = await init(buffer);
+      const worker = new Worker(new URL("./worker.ts", import.meta.url), {
+        type: "module",
+      });
 
-      const data: AlgoInput = {
-        containers: [
-          {
-            id: "container 1",
-            qty: 3,
-            dim: [30, 20, 30],
-          },
-          {
-            id: "container 2",
-            qty: 2,
-            dim: [5, 5, 40],
-          },
-          {
-            id: "container 3",
-            qty: 2,
-            dim: [20, 20, 30],
-          },
-        ],
-        items: [
-          {
-            id: "item 1",
-            qty: 17,
-            dim: [10, 10, 12],
-          },
-          {
-            id: "item 2",
-            qty: 1,
-            dim: [10, 10, 13],
-          },
-          {
-            id: "item 3",
-            qty: 1,
-            dim: [5, 39.5, 5],
-          },
-          {
-            id: "item 4",
-            qty: 200,
-            dim: [6, 5, 8],
-          },
-        ],
+      worker.onmessage = (e) => {
+        if (e.data === "ready") {
+          setWorkerReady(true);
+        }
+
+        if (e.data.type === "pack_result") {
+          console.log(e.data.data);
+          setResult(e.data.data);
+        }
+
+        if (e.data.type === "timing") {
+          console.log(e.data.data);
+        }
       };
-      setResult(packerRef.current.pack(data));
+
+      workerRef.current = worker;
     };
 
     setupPacker();
@@ -78,27 +58,32 @@ export default function App() {
     }, 0) || 0;
 
   return (
-    <Box w="100svw" h="100svh">
-      <Canvas shadows camera={{ position: [0, 0, maxZ + 80], fov: 50 }}>
-        <Center>
-          <group position={position}>
-            {result?.containers?.map((container, idx, arrs) => {
-              let offset = 0;
-              for (let i = 0; i < idx; i++) {
-                offset += arrs[i].dim.length + 10;
-              }
-              return (
-                <group key={idx} position={[offset, 0, 0]}>
-                  <Container data={container} />
-                </group>
-              );
-            })}
-          </group>
-        </Center>
-        <Env />
-        <OrbitControls enablePan={true} enableZoom={true} />
-      </Canvas>
-    </Box>
+    <>
+      <Sidebar isPackingReady={isWorkerReady} onPack={workerPack} />
+      <Box w="100svw" h="100svh">
+        <Canvas shadows camera={{ position: [0, 0, maxZ + 80], fov: 50 }}>
+          {maxZ === 0 ? null : (
+            <Center>
+              <group position={position}>
+                {result?.containers?.map((container, idx, arrs) => {
+                  let offset = 0;
+                  for (let i = 0; i < idx; i++) {
+                    offset += arrs[i].dim.length + 10;
+                  }
+                  return (
+                    <group key={idx} position={[offset, 0, 0]}>
+                      <Container data={container} />
+                    </group>
+                  );
+                })}
+              </group>
+            </Center>
+          )}
+          <Env />
+          <OrbitControls enablePan={true} enableZoom={true} />
+        </Canvas>
+      </Box>
+    </>
   );
 }
 
