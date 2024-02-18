@@ -6,15 +6,28 @@ import BoxFields from "./BoxFields";
 
 type Props = {
   isPackingReady?: boolean;
+  isLoading?: boolean;
   onPack: (input: AlgoInput) => void;
 };
 
 function Sidebar(props: Props) {
-  const { isPackingReady } = props;
+  const { isPackingReady, isLoading } = props;
   const { control, handleSubmit } = useForm<AlgoInput>({
     defaultValues: {
-      containers: [],
-      items: [],
+      containers: [
+        {
+          id: "container 1",
+          qty: 1,
+          dim: [20, 20, 30],
+        },
+      ],
+      items: [
+        {
+          id: "item 1",
+          qty: 5,
+          dim: [10, 10, 30],
+        },
+      ],
     },
   });
 
@@ -50,6 +63,7 @@ function Sidebar(props: Props) {
             w="full"
             colorScheme="purple"
             onClick={onSubmit}
+            isLoading={isLoading}
             isDisabled={!isPackingReady}
           >
             Start Packing

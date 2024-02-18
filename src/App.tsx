@@ -1,4 +1,3 @@
-import { useControls } from "leva";
 import { Box } from "@chakra-ui/react";
 import { Canvas } from "@react-three/fiber";
 import { Center, Environment, OrbitControls, Edges } from "@react-three/drei";
@@ -14,14 +13,98 @@ import Sidebar from "./components/Sidebar";
 
 export default function App() {
   const [isWorkerReady, setWorkerReady] = useState(false);
-  const [result, setResult] = useState<AlgoResult | undefined>(undefined);
-  const workerRef = useRef<Worker>();
-  const { position } = useControls({
-    position: { value: [0, -20, 0], step: 1 },
+  const [isPacking, setPacking] = useState(false);
+  const [result, setResult] = useState<AlgoResult | undefined>({
+    unpacked_items: [
+      {
+        id: "item 1",
+        dim: {
+          length: 10,
+          width: 10,
+          height: 30,
+        },
+        pos: {
+          length: 0,
+          width: 0,
+          height: 0,
+        },
+        rot: "LHW",
+      },
+    ],
+    containers: [
+      {
+        id: "container 1",
+        dim: {
+          length: 20,
+          width: 20,
+          height: 30,
+        },
+        items: [
+          {
+            id: "item 1",
+            dim: {
+              length: 10,
+              width: 10,
+              height: 30,
+            },
+            pos: {
+              length: 0,
+              width: 0,
+              height: 0,
+            },
+            rot: "LWH",
+          },
+          {
+            id: "item 1",
+            dim: {
+              length: 10,
+              width: 10,
+              height: 30,
+            },
+            pos: {
+              length: 10,
+              width: 0,
+              height: 0,
+            },
+            rot: "LWH",
+          },
+          {
+            id: "item 1",
+            dim: {
+              length: 10,
+              width: 10,
+              height: 30,
+            },
+            pos: {
+              length: 0,
+              width: 10,
+              height: 0,
+            },
+            rot: "LWH",
+          },
+          {
+            id: "item 1",
+            dim: {
+              length: 10,
+              width: 10,
+              height: 30,
+            },
+            pos: {
+              length: 10,
+              width: 10,
+              height: 0,
+            },
+            rot: "LWH",
+          },
+        ],
+      },
+    ],
   });
+  const workerRef = useRef<Worker>();
 
   const workerPack = (input: AlgoInput) => {
     setResult(undefined);
+    setPacking(true);
     workerRef.current?.postMessage({ type: "pack", input });
   };
 
@@ -37,12 +120,12 @@ export default function App() {
         }
 
         if (e.data.type === "pack_result") {
-          console.log(e.data.data);
           setResult(e.data.data);
+          setPacking(false);
         }
 
         if (e.data.type === "timing") {
-          console.log(e.data.data);
+          console.log("done in", e.data.data, "ms");
         }
       };
 
@@ -59,12 +142,16 @@ export default function App() {
 
   return (
     <>
-      <Sidebar isPackingReady={isWorkerReady} onPack={workerPack} />
+      <Sidebar
+        isPackingReady={isWorkerReady}
+        isLoading={isPacking}
+        onPack={workerPack}
+      />
       <Box w="100svw" h="100svh">
         <Canvas shadows camera={{ position: [0, 0, maxZ + 80], fov: 50 }}>
           {maxZ === 0 ? null : (
             <Center>
-              <group position={position}>
+              <group position={[0, -20, 0]}>
                 {result?.containers?.map((container, idx, arrs) => {
                   let offset = 0;
                   for (let i = 0; i < idx; i++) {
@@ -89,9 +176,6 @@ export default function App() {
 
 function Container(props: { data: ContainerResult }) {
   const { data } = props;
-  const { roughness } = useControls({
-    roughness: { value: 1, min: 0, max: 1 },
-  });
 
   return (
     <>
@@ -112,7 +196,7 @@ function Container(props: { data: ContainerResult }) {
         />
         <meshStandardMaterial
           metalness={1}
-          roughness={roughness}
+          roughness={1}
           transparent
           opacity={0.1}
         />
@@ -166,8 +250,5 @@ function BoxItem(props: { data: ItemResult }) {
 }
 
 function Env() {
-  const { blur } = useControls({
-    blur: { value: 0.65, min: 0, max: 1 },
-  });
-  return <Environment preset="warehouse" background blur={blur} />;
+  return <Environment preset="warehouse" background blur={0.65} />;
 }
