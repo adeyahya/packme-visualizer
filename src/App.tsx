@@ -8,98 +8,15 @@ import {
   ItemResult,
 } from "packme-wasm";
 import { useMount } from "./hooks/useMount";
-import { useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
+import { SAMPLE_RESULT } from "./constant/sample";
+import { AppContext } from "./components/AppProvider";
 import Sidebar from "./components/Sidebar";
 
 export default function App() {
   const [isWorkerReady, setWorkerReady] = useState(false);
   const [isPacking, setPacking] = useState(false);
-  const [result, setResult] = useState<AlgoResult | undefined>({
-    unpacked_items: [
-      {
-        id: "item 1",
-        dim: {
-          length: 10,
-          width: 10,
-          height: 30,
-        },
-        pos: {
-          length: 0,
-          width: 0,
-          height: 0,
-        },
-        rot: "LHW",
-      },
-    ],
-    containers: [
-      {
-        id: "container 1",
-        dim: {
-          length: 20,
-          width: 20,
-          height: 30,
-        },
-        items: [
-          {
-            id: "item 1",
-            dim: {
-              length: 10,
-              width: 10,
-              height: 30,
-            },
-            pos: {
-              length: 0,
-              width: 0,
-              height: 0,
-            },
-            rot: "LWH",
-          },
-          {
-            id: "item 1",
-            dim: {
-              length: 10,
-              width: 10,
-              height: 30,
-            },
-            pos: {
-              length: 10,
-              width: 0,
-              height: 0,
-            },
-            rot: "LWH",
-          },
-          {
-            id: "item 1",
-            dim: {
-              length: 10,
-              width: 10,
-              height: 30,
-            },
-            pos: {
-              length: 0,
-              width: 10,
-              height: 0,
-            },
-            rot: "LWH",
-          },
-          {
-            id: "item 1",
-            dim: {
-              length: 10,
-              width: 10,
-              height: 30,
-            },
-            pos: {
-              length: 10,
-              width: 10,
-              height: 0,
-            },
-            rot: "LWH",
-          },
-        ],
-      },
-    ],
-  });
+  const [result, setResult] = useState<AlgoResult | undefined>(SAMPLE_RESULT);
   const workerRef = useRef<Worker>();
 
   const workerPack = (input: AlgoInput) => {
@@ -182,16 +99,16 @@ function Container(props: { data: ContainerResult }) {
       <mesh
         castShadow
         position={[
-          data.dim.length / 2 - 0.2,
           data.dim.width / 2 - 0.2,
           data.dim.height / 2 - 0.2,
+          data.dim.length / 2 - 0.2,
         ]}
       >
         <boxGeometry
           args={[
-            data.dim.length + 0.2,
             data.dim.width + 0.2,
             data.dim.height + 0.2,
+            data.dim.length + 0.2,
           ]}
         />
         <meshStandardMaterial
@@ -211,6 +128,7 @@ function Container(props: { data: ContainerResult }) {
 
 function BoxItem(props: { data: ItemResult }) {
   const { data } = props;
+  const { colorMap } = useContext(AppContext);
   const dim = useMemo(() => {
     let result = [data.dim.length, data.dim.width, data.dim.height];
     switch (data.rot) {
@@ -236,14 +154,18 @@ function BoxItem(props: { data: ItemResult }) {
   return (
     <mesh
       position={[
-        data.pos.length + dim[0] / 2,
         data.pos.width + dim[1] / 2,
         data.pos.height + dim[2] / 2,
+        data.pos.length + dim[0] / 2,
       ]}
       castShadow
     >
-      <boxGeometry args={[dim[0], dim[1], dim[2]]} />
-      <meshStandardMaterial metalness={1} roughness={1} color="#0fab55" />
+      <boxGeometry args={[dim[1], dim[2], dim[0]]} />
+      <meshStandardMaterial
+        metalness={1}
+        roughness={1}
+        color={colorMap.get(data.id)}
+      />
       <Edges castShadow />
     </mesh>
   );

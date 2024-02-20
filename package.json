@@ -21,10 +21,12 @@
     "leva": "^0.9.35",
     "lodash": "^4.17.21",
     "packme-wasm": "0.3.0",
+    "random-color": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.1",
-    "three": "^0.161.0"
+    "three": "^0.161.0",
+    "uniqolor": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

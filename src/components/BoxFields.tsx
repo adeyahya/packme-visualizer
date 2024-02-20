@@ -7,27 +7,32 @@ import {
   Heading,
   IconButton,
   Stack,
-  Text,
   Divider,
   Button,
 } from "@chakra-ui/react";
 import { AlgoInput } from "packme-wasm";
 import { Control, useFieldArray } from "react-hook-form";
 import Field from "./Field";
+import { useContext } from "react";
+import { AppContext } from "./AppProvider";
+import uniqolor from "uniqolor";
 
 type Props = {
   control: Control<AlgoInput, any, AlgoInput>;
 };
 
 function BoxFields(props: Props) {
+  const { setColorMap } = useContext(AppContext);
   const { control } = props;
   const boxFields = useFieldArray({ control, name: "items" });
   const add = () => {
+    const id = `Item ${boxFields.fields.length + 1}`;
     boxFields.append({
-      id: `Item ${boxFields.fields.length + 1}`,
+      id,
       dim: [0, 0, 0],
       qty: 1,
     });
+    setColorMap(id, uniqolor(id).color);
   };
   const remove = (idx: number) => {
     boxFields.remove(idx);
@@ -68,24 +73,24 @@ function BoxFields(props: Props) {
               />
             </HStack>
             <Box mt="1">
-              <Text fontSize="xs" mb="1">
-                Dimensions
-              </Text>
               <HStack>
                 <Field
                   flex="1"
+                  label="length"
                   name={`items.${idx}.dim.0`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}
                 />
                 <Field
                   flex="1"
+                  label="width"
                   name={`items.${idx}.dim.1`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}
                 />
                 <Field
                   flex="1"
+                  label="height"
                   name={`items.${idx}.dim.2`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}

@@ -7,7 +7,6 @@ import {
   Heading,
   IconButton,
   Stack,
-  Text,
   Divider,
   Button,
 } from "@chakra-ui/react";
@@ -72,24 +71,24 @@ function ContainerFields(props: Props) {
               />
             </HStack>
             <Box mt="1">
-              <Text fontSize="xs" mb="1">
-                Dimensions
-              </Text>
               <HStack>
                 <Field
                   flex="1"
+                  label="length"
                   name={`containers.${idx}.dim.0`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}
                 />
                 <Field
                   flex="1"
+                  label="width"
                   name={`containers.${idx}.dim.1`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}
                 />
                 <Field
                   flex="1"
+                  label="height"
                   name={`containers.${idx}.dim.2`}
                   control={control}
                   options={{ valueAsNumber: true, min: 1, required: true }}
