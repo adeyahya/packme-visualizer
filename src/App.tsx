@@ -99,9 +99,9 @@ function Container(props: { data: ContainerResult }) {
       <mesh
         castShadow
         position={[
-          data.dim.width / 2 - 0.2,
-          data.dim.height / 2 - 0.2,
-          data.dim.length / 2 - 0.2,
+          data.dim.width / 2,
+          data.dim.height / 2,
+          data.dim.length / 2,
         ]}
       >
         <boxGeometry
